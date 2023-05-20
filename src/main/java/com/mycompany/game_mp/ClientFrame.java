@@ -13,7 +13,7 @@ import java.net.Socket;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.ArrayList;
+import java.util.*;
 /**
  *
  * @author vovab
@@ -27,8 +27,10 @@ public class ClientFrame extends javax.swing.JFrame implements IObserver{
     SocketMessage sm;
     ArrayList<javax.swing.JLabel> simple_labels = new ArrayList();
     ArrayList<javax.swing.JLabel> players = new ArrayList();
+    ArrayList<PlayerEntity> leaders = new ArrayList();
     ArrayList<javax.swing.JLabel> shoots = new ArrayList();
     ArrayList<javax.swing.JLabel> points = new ArrayList();
+    ArrayList<javax.swing.JLabel> wins = new ArrayList();
     
     javax.swing.JLabel pointer;
     //static int players = 0;
@@ -59,6 +61,7 @@ public class ClientFrame extends javax.swing.JFrame implements IObserver{
         Stop = new javax.swing.JButton();
         Shoot = new javax.swing.JButton();
         players2 = new com.mycompany.game_mp.Players();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -105,6 +108,13 @@ public class ClientFrame extends javax.swing.JFrame implements IObserver{
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
+        jButton1.setText("Leaders");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -113,18 +123,21 @@ public class ClientFrame extends javax.swing.JFrame implements IObserver{
                 .addComponent(players2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vModel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 115, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Start, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Shoot, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Stop, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(Start, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Stop, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Shoot, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(vModel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(Start)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(Stop)
@@ -157,6 +170,8 @@ public class ClientFrame extends javax.swing.JFrame implements IObserver{
         checkWinner();
         updatePlayers(m.getClientArrayList());
         updatePlayersInfo(m.getClientArrayList());
+        //leaders = m.getLeadersArrayList();
+        updateTable(m.getLeadersArrayList());
     }
     
     private void checkWinner() {
@@ -165,48 +180,66 @@ public class ClientFrame extends javax.swing.JFrame implements IObserver{
         }
     }
     
-    private void updatePlayers(ArrayList<ClientInfo> a) {
+    private synchronized void updateTable(ArrayList<PlayerEntity> a) {
+        if (a == null || a.size() == 0) return;
+        leaders = a;
+    }
+    
+    private synchronized void updatePlayers(ArrayList<ClientInfo> a) {
         if (a == null || a.size() == 0 || players.size() == a.size()) return;
         for (int i = 0; i < a.size(); i++) {
             if (i>=players.size()) {
                 javax.swing.JLabel sl = new javax.swing.JLabel("Игрок: ");
                 add(sl);
-                sl.setLocation(601, 6 + 56*i);
+                sl.setLocation(601, 6 + 75*i);  //56
                 sl.setSize(40, 16);
                 simple_labels.add(sl);
                 
                 javax.swing.JLabel sl2 = new javax.swing.JLabel("Счет: ");
                 add(sl2);
-                sl2.setLocation(601, 23 + 56*i);
+                sl2.setLocation(601, 23 + 75*i);
                 sl2.setSize(40, 16);
                 simple_labels.add(sl2);
                 
                 javax.swing.JLabel sl3 = new javax.swing.JLabel("Выстрелов: ");
                 add(sl3);
-                sl3.setLocation(601, 40 + 56*i);
+                sl3.setLocation(601, 40 + 75*i);
                 sl3.setSize(80, 16);
                 simple_labels.add(sl3);
                 
+                javax.swing.JLabel sl4 = new javax.swing.JLabel("Побед: ");
+                add(sl4);
+                sl4.setLocation(601, 57 + 75*i);
+                sl4.setSize(80, 16);
+                simple_labels.add(sl4);
+                
                 javax.swing.JLabel l_name = new javax.swing.JLabel(a.get(i).getPlayerName());
                 add(l_name);
-                l_name.setLocation(641, 6 + 56*i);
+                l_name.setLocation(641, 6 + 75*i);
                 l_name.setSize(100, 16);
                 //l.setText(a.get(i).getPlayerName());
                 players.add(l_name);
                 
                 javax.swing.JLabel l_points = new javax.swing.JLabel(String.valueOf(a.get(i).getPoints()));
                 add(l_points);
-                l_points.setLocation(641, 23 + 56*i);
+                l_points.setLocation(641, 23 + 75*i);
                 l_points.setSize(40, 16);
                 //l.setText(a.get(i).getPlayerName());
                 points.add(l_points);
                 
                 javax.swing.JLabel l_shoots = new javax.swing.JLabel(String.valueOf(a.get(i).getArrowsShoot()));
                 add(l_shoots);
-                l_shoots.setLocation(671, 40 + 56*i);
+                l_shoots.setLocation(671, 40 + 75*i);
                 l_shoots.setSize(40, 16);
                 //l.setText(a.get(i).getPlayerName());
                 shoots.add(l_shoots);
+                
+                javax.swing.JLabel l_wins = new javax.swing.JLabel(String.valueOf(a.get(i).getWins()));
+                add(l_wins);
+                l_wins.setLocation(671, 57 + 75*i);
+                l_wins.setSize(40, 16);
+                //l.setText(a.get(i).getPlayerName());
+                wins.add(l_wins);
             }
         }
         
@@ -223,11 +256,12 @@ public class ClientFrame extends javax.swing.JFrame implements IObserver{
         }
     }
     
-    private void updatePlayersInfo(ArrayList<ClientInfo> a) {
+    private synchronized void updatePlayersInfo(ArrayList<ClientInfo> a) {
         if (a == null || a.size() == 0) return;
         for (int i = 0; i < a.size(); i++) {
             points.get(i).setText(String.valueOf(a.get(i).getPoints()));
             shoots.get(i).setText(String.valueOf(a.get(i).getArrowsShoot()));
+            wins.get(i).setText(String.valueOf(a.get(i).getWins()));
         }
     }
     
@@ -243,6 +277,27 @@ public class ClientFrame extends javax.swing.JFrame implements IObserver{
         sendRequest(new ClientReq(ClientActions.SHOOT));
         System.out.println(m.big.getY());
     }//GEN-LAST:event_ShootActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        //sendRequest(new ClientReq(ClientActions.SCORE_TABLE));
+        //update();
+        
+        String[] columnNames = {"Имя", "Число побед"};
+        ArrayList<PlayerEntity> data = m.updateLeaders();
+        System.out.println(leaders.size());
+        Collections.sort(data, new ComparatorEntity());
+        int size;
+        if (data.size() < 3) size = data.size();
+        else size = 3;
+        String[][] rowData = new String[size][2];
+        for (int i = 0; i < size; i++) {
+            rowData[i][0] = data.get(i).getName();
+            rowData[i][1] = String.valueOf(data.get(i).getWins());
+        }
+        javax.swing.JTable table = new javax.swing.JTable(rowData, columnNames);
+        //JOptionPane.showMessageDialog(this, table);
+        JOptionPane.showMessageDialog(this, table, "Лидеры", 1);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -284,6 +339,7 @@ public class ClientFrame extends javax.swing.JFrame implements IObserver{
     private javax.swing.JButton Shoot;
     private javax.swing.JButton Start;
     private javax.swing.JButton Stop;
+    private javax.swing.JButton jButton1;
     private com.mycompany.game_mp.Players players2;
     private com.mycompany.game_mp.VModel vModel1;
     // End of variables declaration//GEN-END:variables

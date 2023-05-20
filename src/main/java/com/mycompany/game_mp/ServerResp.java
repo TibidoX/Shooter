@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class ServerResp {
     public ArrayList<ClientInfo> clientArrayList;
     public ArrayList<MyPoint> arrowArrayList;
+    public ArrayList<PlayerEntity> leadersArrayList;
     MyPoint big, small;
     //public ArrayList<MyPoint> targetArrayList;
     public String winner;

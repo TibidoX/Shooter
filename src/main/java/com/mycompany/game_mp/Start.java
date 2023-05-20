@@ -103,10 +103,13 @@ public class Start extends javax.swing.JFrame {
                                     Gson gson = new Gson();
                                     ServerResp ra = gson.fromJson(s, ServerResp.class);
                                     //m.setTargetArrayList(ra.circleArrayList);
+                                    m.setLeadersArrayList(ra.leadersArrayList);
                                     m.big = ra.big;
                                     m.small = ra.small;
                                     m.setClientArrayList(ra.clientArrayList);
                                     m.setArrowArrayList(ra.arrowArrayList);
+                                    
+                                    System.out.println(m.getLeadersArrayList().size());
                                     m.setWinner(ra.winner);
                                     m.update();
                                 }

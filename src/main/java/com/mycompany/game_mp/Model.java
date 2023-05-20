@@ -13,6 +13,8 @@ import java.util.ArrayList;
 public class Model {
     private final ArrayList<IObserver> observerArrayList = new ArrayList<>();
     private ArrayList<ClientInfo> clientArrayList = new ArrayList<>();
+    private ArrayList<PlayerEntity> entityArrayList = new ArrayList<>();
+    private ArrayList<PlayerEntity> leadersArrayList = new ArrayList<>();
     MyPoint big = new MyPoint(275, 159, 20); 
     MyPoint small = new MyPoint(355, 159, 10);
     private volatile boolean isGameReset = true;
@@ -24,10 +26,23 @@ public class Model {
     private final ArrayList<String> waitingList = new ArrayList<>();
     private final ArrayList<String> shootingList = new ArrayList<>();
     
+    private DB db; //private
+    
     public void update() {
         for (IObserver o: observerArrayList) {
             o.update();
         }
+    }
+    
+    public void initDB(DB db) {
+        this.db = db;
+    }
+    
+    public ArrayList<PlayerEntity> updateLeaders() {
+        if (db == null) db = new DataBase_hibernate();
+        return db.getAllPlayers();
+        //ms.bcast();
+        //System.out.println(leadersArrayList.size());
     }
     
     public void moveBig(int mov) { //mov - napravlenie
@@ -251,9 +266,17 @@ public class Model {
     
     private synchronized void checkWinner() {
         clientArrayList.forEach(clientDataManager -> {
-            if (clientDataManager.getPoints() >= 10) {
+            if (clientDataManager.getPoints() >= 3) {
                 this.winner = clientDataManager.getPlayerName();
                 gameReset();
+                
+                PlayerEntity pe = entityArrayList.stream()
+                        .filter(entity -> entity.getName().equals(winner))
+                        .findFirst()
+                        .orElse(null);
+                pe.setWins(pe.getWins()+1);
+                db.setPlayerWins(pe);
+                clientDataManager.increaseWins();
                 return;
             }
         });
@@ -264,8 +287,27 @@ public class Model {
     }
     
     public void addClient(ClientInfo clientData) {
-        clientArrayList.add(clientData);
-        this.arrowsCountUpdate();
+//        clientArrayList.add(clientData);
+//        clientData.setWins(0);
+//        PlayerEntity pe = new PlayerEntity();
+//        pe.setName(clientData.getPlayerName());
+//        pe.setWins(clientData.getWins());
+//        entityArrayList.add(pe);
+//        db.addPlayer(pe);
+//        this.arrowsCountUpdate();
+            
+          PlayerEntity pe = new PlayerEntity();
+          if (db.findPlayer(clientData.getPlayerName())) {
+              pe = db.getPlayerWins(clientData.getPlayerName());
+          } else {
+              pe.setName(clientData.getPlayerName());
+              pe.setWins(0);
+              db.addPlayer(pe);
+          }
+          clientData.setWins(pe.getWins());
+          clientArrayList.add(clientData);
+          entityArrayList.add(pe);
+          this.arrowsCountUpdate();
     }
     
     public void setClientArrayList(ArrayList<ClientInfo> clientArrayList) {
@@ -278,5 +320,13 @@ public class Model {
     
     public void setWinner(String winner) {
         this.winner = winner;
+    }
+    
+    public ArrayList<PlayerEntity> getLeadersArrayList() {
+        return this.leadersArrayList;
+    }
+    
+    public void setLeadersArrayList(ArrayList<PlayerEntity> pa) {
+        this.leadersArrayList = pa;
     }
 }

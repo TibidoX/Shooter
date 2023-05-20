@@ -46,6 +46,8 @@ public class MainServer {
             ip = InetAddress.getLocalHost();
             ss = new ServerSocket(port, 2, ip); //?2?
             System.out.append("Server start\n");
+            DB db = new DataBase_hibernate();
+            m.initDB(db);
             m.addTarget(new MyPoint(275, 159, 20), new MyPoint(355, 159, 10));
             
             while(true)

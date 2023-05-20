@@ -13,6 +13,7 @@ public class ClientInfo {
     private String playerName;
     private int arrowsShoot = 0;
     private int points = 0;
+    private int wins = 0;
     
     public ClientInfo(String playerName) {
         this.playerName = playerName;
@@ -41,5 +42,17 @@ public class ClientInfo {
     public void reset() {
         arrowsShoot = 0;
         points = 0;
+    }
+    
+    public int getWins() {
+        return wins;
+    }
+    
+    public void setWins(int wins) {
+        this.wins = wins;
+    }
+    
+    public void increaseWins() {
+        this.wins += 1;
     }
 }

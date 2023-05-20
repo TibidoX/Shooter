@@ -12,5 +12,6 @@ package com.mycompany.game_mp;
 public enum ClientActions {
     READY,
     SHOOT,
-    STOP
+    STOP,
+    SCORE_TABLE
 }

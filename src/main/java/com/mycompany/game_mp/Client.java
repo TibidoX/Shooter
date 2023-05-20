@@ -41,6 +41,7 @@ public class Client implements Runnable{
             ServerResp serverResp = new ServerResp();
             serverResp.clientArrayList = m.getClientArrayList();
             serverResp.arrowArrayList = m.getArrowArrayList();
+            serverResp.leadersArrayList = m.getLeadersArrayList();
             //serverResp.circleArrayList = model.getTargetArrayList();
             serverResp.big = m.big;
             serverResp.small = m.small;
@@ -94,7 +95,10 @@ public class Client implements Runnable{
                 if (msg.getClientActions() == ClientActions.SHOOT) {
                     m.requestShoot(getPlayerName());
                 }
-
+//                if (msg.getClientActions() == ClientActions.SCORE_TABLE)
+//                {
+//                    m.updateLeaders(ms);
+//                }
 
             }
         } catch (IOException ignored) {
